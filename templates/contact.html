@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="contact-section">
+
+    <h1 class="contact-title" data-aos="fade-up">Contact Me</h1>
+
+    <p class="contact-subtitle" data-aos="fade-up" data-aos-delay="150">
+        Have a project in mind? Let’s connect! 🚀
+    </p>
+
+    <div class="contact-container" data-aos="zoom-in">
+
+        <form method="POST" class="contact-form">
+
+            <input type="text" name="name" placeholder="Your Name" required class="contact-input">
+
+            <input type="email" name="email" placeholder="Your Email" required class="contact-input">
+
+            <textarea name="message" placeholder="Your Message" required class="contact-textarea"></textarea>
+
+            <button type="submit" class="contact-btn">Send Message</button>
+
+            {% if success %}
+            <p class="success-text">Message Sent Successfully! ✔</p>
+            {% endif %}
+
+        </form>
+
+    </div>
+
+</section>
+
+{% endblock %}

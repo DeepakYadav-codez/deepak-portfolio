@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="projects-section">
+
+    <h1 class="section-title">My Projects</h1>
+
+    <div class="projects-grid">
+
+        {% for p in projects %}
+        <div class="project-card">
+            <h2>{{ p.name }}</h2>
+            <p>{{ p.description }}</p>
+            <span class="tech">{{ p.tech }}</span>
+        </div>
+        {% endfor %}
+
+    </div>
+
+</section>
+
+{% endblock %}
