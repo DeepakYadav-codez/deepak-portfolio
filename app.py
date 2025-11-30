@@ -1,16 +1,17 @@
 from flask import Flask, render_template, request, send_from_directory
 import os
 import smtplib
-from email.message import EmailMessage
-from dotenv import load_dotenv
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 app = Flask(__name__)
 
-# Load environment variables from .env
-load_dotenv()
-
-EMAIL_USER = os.getenv("EMAIL_USER")
-EMAIL_PASS = os.getenv("EMAIL_PASS")
+# Load SMTP Credentials from Render Environment
+SMTP_HOST = os.environ.get("SMTP_HOST")
+SMTP_PORT = os.environ.get("SMTP_PORT")
+SMTP_USER = os.environ.get("SMTP_USER")
+SMTP_KEY = os.environ.get("SMTP_KEY")
+SMTP_SENDER = os.environ.get("SMTP_SENDER")
 
 # ------------ ROUTES ------------ #
 
@@ -18,11 +19,9 @@ EMAIL_PASS = os.getenv("EMAIL_PASS")
 def home():
     return render_template("home.html")
 
-
 @app.route("/about")
 def about():
     return render_template("about.html")
-
 
 @app.route("/projects")
 def projects():
@@ -40,19 +39,15 @@ def projects():
     ]
     return render_template("projects.html", projects=projects_data)
 
-
 @app.route("/resume")
 def resume():
     return render_template("resume.html")
 
-
-# DOWNLOAD RESUME
 @app.route("/download")
 def download_resume():
     return send_from_directory("resume", "Deepak_Resume.pdf", as_attachment=True)
 
-
-# CONTACT FORM + EMAIL SENDING
+# CONTACT FORM USING BREVO SMTP
 @app.route("/contact", methods=["GET", "POST"])
 def contact():
     if request.method == "POST":
@@ -61,57 +56,46 @@ def contact():
         message = request.form["message"]
 
         # Email to YOU
-        msg_to_you = EmailMessage()
-        msg_to_you["Subject"] = "New Contact Message from Portfolio"
-        msg_to_you["From"] = EMAIL_USER
-        msg_to_you["To"] = EMAIL_USER
+        msg = MIMEMultipart()
+        msg["From"] = SMTP_SENDER
+        msg["To"] = SMTP_SENDER
+        msg["Subject"] = f"New Contact Form Message from {name}"
 
-        msg_to_you.set_content(f"""
-You received a new message from your portfolio website:
-
-Name: {name}
-Email: {email}
-
-Message:
-{message}
-        """)
+        body = f"""
+        Name: {name}
+        Email: {email}
+        Message:
+        {message}
+        """
+        msg.attach(MIMEText(body, "plain"))
 
         # Auto Reply to USER
-        msg_to_user = EmailMessage()
-        msg_to_user["Subject"] = "Thank you for contacting me!"
-        msg_to_user["From"] = EMAIL_USER
-        msg_to_user["To"] = email
+        reply = MIMEMultipart()
+        reply["From"] = SMTP_SENDER
+        reply["To"] = email
+        reply["Subject"] = "Thank you for contacting Deepak!"
 
-        msg_to_user.set_content(f"""
-Hi {name},
-
-Thank you for reaching out!
-I have received your message and I will get back to you shortly.
-
-Your Message:
-{message}
-
-Best Regards,
-{os.getenv("REPLY_NAME")}
-""")
+        reply.attach(MIMEText(
+            f"Hello {name},\n\nThank you for your message!\nI have received it and will get back to you soon.\n\nBest Regards,\nDeepak",
+            "plain"
+        ))
 
         try:
-            # Connect to Gmail SMTP
-            with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
-                smtp.login(EMAIL_USER, EMAIL_PASS)
+            with smtplib.SMTP(SMTP_HOST, int(SMTP_PORT)) as server:
+                server.starttls()
+                server.login(SMTP_USER, SMTP_KEY)
 
-                # Send both emails
-                smtp.send_message(msg_to_you)
-                smtp.send_message(msg_to_user)
+                # send both emails
+                server.sendmail(SMTP_SENDER, SMTP_SENDER, msg.as_string())
+                server.sendmail(SMTP_SENDER, email, reply.as_string())
 
             return render_template("contact.html", success=True)
 
         except Exception as e:
             print("EMAIL ERROR:", e)
-            return render_template("contact.html", error=True)
+            return "Internal Server Error", 500
 
     return render_template("contact.html")
-
 
 
 # ------------ MAIN ------------ #
