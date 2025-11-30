@@ -3,15 +3,18 @@ import os
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+import ssl
 
 app = Flask(__name__)
 
-# Load SMTP Credentials from Render Environment
+# Load Brevo SMTP Credentials from Render Environment Variables
 SMTP_HOST = os.environ.get("SMTP_HOST")
 SMTP_PORT = os.environ.get("SMTP_PORT")
 SMTP_USER = os.environ.get("SMTP_USER")
 SMTP_KEY = os.environ.get("SMTP_KEY")
 SMTP_SENDER = os.environ.get("SMTP_SENDER")
+SMTP_NAME = os.environ.get("SMTP_NAME")  # Optional - for reply name
+
 
 # ------------ ROUTES ------------ #
 
@@ -19,9 +22,11 @@ SMTP_SENDER = os.environ.get("SMTP_SENDER")
 def home():
     return render_template("home.html")
 
+
 @app.route("/about")
 def about():
     return render_template("about.html")
+
 
 @app.route("/projects")
 def projects():
@@ -39,15 +44,19 @@ def projects():
     ]
     return render_template("projects.html", projects=projects_data)
 
+
 @app.route("/resume")
 def resume():
     return render_template("resume.html")
 
+
+# DOWNLOAD RESUME
 @app.route("/download")
 def download_resume():
     return send_from_directory("resume", "Deepak_Resume.pdf", as_attachment=True)
 
-# CONTACT FORM USING BREVO SMTP
+
+# ------------ CONTACT FORM (Brevo SMTP) ------------ #
 @app.route("/contact", methods=["GET", "POST"])
 def contact():
     if request.method == "POST":
@@ -62,8 +71,11 @@ def contact():
         msg["Subject"] = f"New Contact Form Message from {name}"
 
         body = f"""
+        New Contact Form Message:
+
         Name: {name}
         Email: {email}
+
         Message:
         {message}
         """
@@ -75,17 +87,31 @@ def contact():
         reply["To"] = email
         reply["Subject"] = "Thank you for contacting Deepak!"
 
-        reply.attach(MIMEText(
-            f"Hello {name},\n\nThank you for your message!\nI have received it and will get back to you soon.\n\nBest Regards,\nDeepak",
-            "plain"
-        ))
+        reply_body = f"""
+Hello {name},
+
+Thank you for contacting me!
+I have received your message and I will get back to you shortly.
+
+Your Message:
+{message}
+
+Best Regards,
+{SMTP_NAME}
+        """
+
+        reply.attach(MIMEText(reply_body, "plain"))
 
         try:
+            # Secure TLS context
+            context = ssl.create_default_context()
+
+            # Connect to Brevo SMTP
             with smtplib.SMTP(SMTP_HOST, int(SMTP_PORT)) as server:
-                server.starttls()
+                server.starttls(context=context)
                 server.login(SMTP_USER, SMTP_KEY)
 
-                # send both emails
+                # Send emails
                 server.sendmail(SMTP_SENDER, SMTP_SENDER, msg.as_string())
                 server.sendmail(SMTP_SENDER, email, reply.as_string())
 
@@ -93,7 +119,7 @@ def contact():
 
         except Exception as e:
             print("EMAIL ERROR:", e)
-            return "Internal Server Error", 500
+            return render_template("contact.html", error=True)
 
     return render_template("contact.html")
 
