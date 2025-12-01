@@ -497,53 +497,48 @@ body.light-mode {
     color: #1a1a1a;
 }
 
-/* =======================
-       FOOTER SECTION
-======================= */
-
+/* Footer */
 .footer {
-    margin-top: 60px;
-    padding: 50px 20px;
-    background: #f4f6fb;
+    background: #ffffff;
+    color: #222;
+    padding: 25px 0;
     text-align: center;
-    border-top: 1px solid #e3e3e3;
+    margin-top: 40px;
+    border-top: 1px solid #e4e4e4;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
 }
 
 .footer-container {
-    max-width: 800px;
+    max-width: 900px;
     margin: auto;
 }
 
-.footer-title {
-    font-size: 26px;
-    font-weight: 700;
-    margin-bottom: 8px;
-}
-
 .footer-text {
-    font-size: 15px;
+    font-size: 14px;
+    margin-bottom: 10px;
     color: #444;
-    margin-bottom: 20px;
 }
 
 /* Social Icons */
-.footer-social a {
-    font-size: 25px;
+.social-links {
+    margin-top: 10px;
+}
+
+.social-links a {
     margin: 0 12px;
     display: inline-block;
+}
+
+.social-links img {
+    width: 32px;
+    filter: brightness(0) saturate(100%);
     transition: 0.3s ease;
+    opacity: 0.7;
 }
 
-.footer-social a:hover {
-    transform: translateY(-6px);
-    color: #007bff;
+/* Hover Animation */
+.social-links img:hover {
+    transform: scale(1.22) translateY(-3px);
+    opacity: 1;
+    filter: brightness(1) invert(29%) sepia(88%) saturate(4000%) hue-rotate(202deg) brightness(96%) contrast(101%);
 }
-
-/* Copyright Text */
-.footer-copy {
-    margin-top: 25px;
-    font-size: 14px;
-    color: #666;
-}
-
-

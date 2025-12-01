@@ -53,25 +53,27 @@
 
     <!-- FOOTER -->
 <footer class="footer">
-
     <div class="footer-container">
 
-        <h2 class="footer-title">Deepak Codez</h2>
+        <p class="footer-text">© 2025 Deepak Yadav | All Rights Reserved</p>
 
-        <p class="footer-text">Backend Developer • Python • Flask • MongoDB</p>
+        <div class="social-links">
+            <a href="https://github.com/DeepakYadav-codez" target="_blank">
+                <img src="{{ url_for('static', filename='icons/github.svg') }}" alt="GitHub">
+            </a>
 
-        <div class="footer-social">
-            <a href="#" target="_blank">💼</a>
-            <a href="#" target="_blank">📸</a>
-            <a href="#" target="_blank">🐦</a>
-            <a href="#" target="_blank">💻</a>
+            <a href="https://www.instagram.com/dy_1357?igsh=MTQxZmptdGtoZWV6bA==" target="_blank">
+                <img src="{{ url_for('static', filename='icons/instagram.svg') }}" alt="Instagram">
+            </a>
+
+            <a href="https://www.linkedin.com/in/deepak-yadav-b076a82a7" target="_blank">
+                <img src="{{ url_for('static', filename='icons/linkedin.svg') }}" alt="LinkedIn">
+            </a>
         </div>
 
-        <p class="footer-copy">© {{ 2025 }} Deepak Yadav. All Rights Reserved.</p>
-
     </div>
-
 </footer>
+
 
 </body>
 </html>
